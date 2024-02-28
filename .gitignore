@@ -1,0 +1,6 @@
+.vscode/
+build/
+.idea/
+*__pycache__*
+agilepy
+planner_learning/data/*
