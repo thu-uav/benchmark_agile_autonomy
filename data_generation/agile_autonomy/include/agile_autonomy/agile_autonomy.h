@@ -71,6 +71,7 @@ class AgileAutonomy {
   ros::Publisher ref_progress_pub_;
   ros::Publisher setpoint_pub_;
   ros::Publisher compute_global_path_pub_;
+  ros::Publisher proj_time_pub_;
 
   ros::Timer save_timer_;
 

@@ -24,7 +24,7 @@ class Trainer():
         self.settings = settings
         np.random.seed(self.settings.random_seed)
         self.expert_done = False
-        self.label_sub = rospy.Subscriber("/hummingbird/labelling_completed", Bool,
+        self.label_sub = rospy.Subscriber("/air/labelling_completed", Bool,
                                           self.callback_expert, queue_size=1)  # Expert is done, decide what to do.
         self.msg_handler = MessageHandler()
 
@@ -35,7 +35,7 @@ class Trainer():
 
     def start_experiment(self, rollout_idx):
         self.msg_handler.publish_reset()
-        place_quad_at_start(self.msg_handler)
+        # place_quad_at_start(self.msg_handler)
         print("Doing experiment {}".format(rollout_idx))
         # Save point_cloud
         if self.settings.execute_nw_predictions:

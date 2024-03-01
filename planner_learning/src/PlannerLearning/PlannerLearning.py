@@ -28,14 +28,14 @@ class PlanLearning(PlanBase):
         self.planner_succed = True
         if config.track_global_traj:
             # Eliminate slow-down maneuver, gives ambigous labels.
-            self.end_ref_percentage = 0.95
+            self.end_ref_percentage = 1.00
         else:
-            self.end_ref_percentage = 0.8
-        self.data_pub = rospy.Publisher("/hummingbird/agile_autonomy/start_flying", Bool,
+            self.end_ref_percentage = 1.00
+        self.data_pub = rospy.Publisher("/air/agile_autonomy/start_flying", Bool,
                                         queue_size=1)  # Stop upon some condition
         self.planner_succed_sub = rospy.Subscriber("/test_primitive/completed_planning",
                                                   Bool, self.planner_succed_callback, queue_size=1)
-        self.label_data_pub = rospy.Publisher("/hummingbird/start_label", Bool,
+        self.label_data_pub = rospy.Publisher("/air/start_label", Bool,
                                               queue_size=1)  # Stop upon some condition
         self.success_subs = rospy.Subscriber("success_reset", Empty,
                                              self.callback_success_reset,
@@ -71,8 +71,7 @@ class PlanLearning(PlanBase):
             # Load pointcloud and make kdtree out of it
             rollout_dir = os.path.join(self.config.expert_folder,
                                        sorted(os.listdir(self.config.expert_folder))[-1])
-            pointcloud_fname = os.path.join(
-                rollout_dir, "pointcloud-unity.ply")
+            pointcloud_fname = os.path.join(os.environ["FLIGHTMARE_PATH"], self.config.scene_path, "env.ply")
             print("Reading pointcloud from %s" % pointcloud_fname)
             self.pcd = o3d.io.read_point_cloud(pointcloud_fname)
             self.pcd_tree = o3d.geometry.KDTreeFlann(self.pcd)
@@ -122,7 +121,7 @@ class PlanLearning(PlanBase):
 
     def callback_success_reset(self, data):
         print("Received call to Clear Buffer and Restart Experiment")
-        os.system("rosservice call /gazebo/pause_physics")
+        # os.system("rosservice call /gazebo/pause_physics")
         self.rollout_idx += 1
         self.use_network = False
         self.pcd = None
@@ -141,7 +140,7 @@ class PlanLearning(PlanBase):
         self.reset_queue()
         self.reset_metrics()
         print("Resetting experiment")
-        os.system("rosservice call /gazebo/unpause_physics")
+        # os.system("rosservice call /gazebo/unpause_physics")
         print('Done Reset')
 
     def check_task_progress(self, _timer):
@@ -179,7 +178,7 @@ class PlanLearning(PlanBase):
             print(quad_position)
             self.publish_stop_recording_msg()
             return
-        if self.reference_progress > 50: # first second used to warm up
+        if self.reference_progress > 40: # first second used to warm up
             self.update_metrics(quad_position)
 
     def update_metrics(self, quad_position):
@@ -214,7 +213,7 @@ class PlanLearning(PlanBase):
             self.crashed = False
 
     def evaluate_dagger_condition(self):
-        if self.reference_progress < 50:
+        if self.reference_progress <40:
             # At the beginning always use expert (otherwise gives gazebo problems)
             print("Starting up!")
             return False

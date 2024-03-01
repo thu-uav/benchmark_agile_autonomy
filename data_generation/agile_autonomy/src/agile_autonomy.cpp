@@ -5,6 +5,7 @@
 #include <experimental/filesystem>
 #include <iomanip>
 #include <string>
+#include <chrono>
 
 #include <Eigen/Dense>
 #include <opencv2/core.hpp>
@@ -13,6 +14,7 @@
 #include "quadrotor_common/parameter_helper.h"
 #include "quadrotor_common/trajectory_point.h"
 #include "std_msgs/Int32.h"
+#include "std_msgs/Float32.h"
 #include "tf/transform_listener.h"
 #include "trajectory_generation_helper/acrobatic_sequence.h"
 
@@ -61,6 +63,7 @@ AgileAutonomy::AgileAutonomy(const ros::NodeHandle& nh,
       pnh_.advertise<quadrotor_msgs::TrajectoryPoint>("setpoint", 1);
   compute_global_path_pub_ =
       pnh_.advertise<std_msgs::Float32>("compute_global_plan", 1);
+  proj_time_pub_ = pnh_.advertise<std_msgs::Float32>("/projection_time", 10);
 
   // Saving timer
   save_timer_ = nh_.createTimer(ros::Duration(1.0 / save_freq_),
@@ -75,9 +78,9 @@ AgileAutonomy::AgileAutonomy(const ros::NodeHandle& nh,
     fine_sample_times_.push_back(0.02 * i);
   }
 
-  ROS_INFO("Connecting to unity...");
-  flightmare_bridge_ =
-      std::make_shared<flightmare_bridge::FlightmareBridge>(nh_, pnh_);
+  // ROS_INFO("Connecting to unity...");
+  // flightmare_bridge_ =
+  //     std::make_shared<flightmare_bridge::FlightmareBridge>(nh_, pnh_);
   unity_is_ready_ = true;
 }
 
@@ -193,7 +196,7 @@ void AgileAutonomy::computeManeuver(const bool only_expert) {
     // create directory
     logging_helper_.createDirectories(data_dir_, &curr_data_dir_);
     // spawns both trees and objects, depending on the params set
-    flightmare_bridge_->spawnObjects(start_state);
+    // flightmare_bridge_->spawnObjects(start_state);
     //  save unity point cloud, adapt point cloud size to maneuver
     Eigen::Vector3d max_corner =
         Eigen::Vector3d::Ones() * std::numeric_limits<double>::min();
@@ -209,8 +212,8 @@ void AgileAutonomy::computeManeuver(const bool only_expert) {
       max_corner[2] = std::max(max_corner[2], point.position.z());
     }
 
-    flightmare_bridge_->generatePointcloud(min_corner, max_corner,
-                                           curr_data_dir_);
+    // flightmare_bridge_->generatePointcloud(min_corner, max_corner,
+    //                                        curr_data_dir_);
 
     // open log file
     logging_helper_.newOdometryLog(curr_data_dir_ + "/odometry.csv");
@@ -294,7 +297,7 @@ void AgileAutonomy::saveLoop(const ros::TimerEvent& time) {
               temp_state_estimate, temp_reference, time_start_logging_,
               reference_progress_abs_, cam_pitch_angle_)) {
         // log file not yet ready!
-        flightmare_bridge_->getImages(temp_state_estimate, "", 0);
+        // flightmare_bridge_->getImages(temp_state_estimate, "", 0);
         return;
       }
 
@@ -308,13 +311,13 @@ void AgileAutonomy::saveLoop(const ros::TimerEvent& time) {
                                             csv_filename_wf);
       }
 
-      flightmare_bridge_->getImages(temp_state_estimate, curr_data_dir_,
-                                    frame_counter_);
+      // flightmare_bridge_->getImages(temp_state_estimate, curr_data_dir_,
+      //                               frame_counter_);
       frame_counter_ += 1;
     } else {
       // we don't save data but would like to see the images in RViz
       if (!setup_done_) {
-        flightmare_bridge_->getImages(temp_state_estimate, "", 0);
+        // flightmare_bridge_->getImages(temp_state_estimate, "", 0);
       }
     }
   }
@@ -594,6 +597,8 @@ void AgileAutonomy::odometryCallback(const nav_msgs::OdometryConstPtr& msg) {
       start_flying_pub_.publish(false_msg);
     }
 
+    auto t_start = std::chrono::system_clock::now();
+
     if (state_machine_ == StateMachine::kExecuteExpert) {
       quadrotor_common::TrajectoryPoint curr_state;
       curr_state.position = predicted_state.position;
@@ -658,6 +663,10 @@ void AgileAutonomy::odometryCallback(const nav_msgs::OdometryConstPtr& msg) {
     const ros::Duration control_computation_time =
         ros::Time::now() - start_control_command_computation;
 
+    auto t_proj = std::chrono::system_clock::now() - t_start;
+    std_msgs::Float32 time_msg;
+    time_msg.data = std::chrono::duration_cast<std::chrono::nanoseconds>(t_proj).count() / 1e6;
+    proj_time_pub_.publish(time_msg);
     publishControlCommand(control_cmd);
   }
 }

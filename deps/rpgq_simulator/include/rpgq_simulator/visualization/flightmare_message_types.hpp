@@ -46,7 +46,7 @@ struct Camera_t {
   int width{1024};
   int height{768};
   double fov{70.0f};
-  double depth_scale{0.20};  // 0.xx corresponds to xx cm resolution
+  double depth_scale{0.02};  // 0.xx corresponds to xx cm resolution
   // metadata
   bool is_depth{false};
   int output_index{0};

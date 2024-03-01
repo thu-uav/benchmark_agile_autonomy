@@ -125,6 +125,7 @@ class TestSetting(Settings):
             self.max_rollouts = test_time['max_rollouts']
             self.expert_folder = test_time['expert_folder']
             self.crashed_thr = test_time['crashed_thr']
+            self.scene_path = test_time['scene_path']
             # Prediction speed
             self.network_frequency = test_time['network_frequency']
             self.fallback_radius_expert = test_time['fallback_radius_expert']

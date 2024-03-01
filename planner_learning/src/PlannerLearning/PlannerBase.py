@@ -6,9 +6,11 @@ import numpy as np
 import rospy
 import cv2
 import pandas as pd
+import time
 
 from cv_bridge import CvBridge, CvBridgeError
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Float32
 from quadrotor_msgs.msg import TrajectoryPoint
 from quadrotor_msgs.msg import Trajectory
 from sensor_msgs.msg import Image
@@ -82,6 +84,10 @@ class PlanBase(object):
                                        self.update_input_queues)
         self.timer_net = rospy.Timer(rospy.Duration(1. / self.config.network_frequency),
                                      self._generate_plan)
+        self.preproces_time_pub_ = rospy.Publisher("/mapping_time", Float32,
+                                            queue_size=1)
+        self.planning_time_pub_ = rospy.Publisher("/planning_time", Float32,
+                                            queue_size=1)
 
     def load_trajectory(self, traj_fname):
         self.reference_initialized = False
@@ -202,12 +208,13 @@ class PlanBase(object):
         Reads a depth image and saves it.
         '''
         try:
+            start_time = time.time_ns()
             if self.quad_name == 'hummingbird':
                 depth = self.bridge.imgmsg_to_cv2(data, '16UC1')
-                print("============================================================")
-                print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
-                                                                       np.max(depth),
-                                                                       np.any(np.isnan(depth))))
+                # print("============================================================")
+                # print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
+                #                                                        np.max(depth),
+                #                                                        np.any(np.isnan(depth))))
                 # print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
                 #                                                        np.max(depth),
                 #                                                        np.any(np.isnan(depth))))
@@ -216,13 +223,28 @@ class PlanBase(object):
                 # the depth sensor is mounted in a flipped configuration on the quadrotor, so flip image first
                 depth_flipped = self.bridge.imgmsg_to_cv2(data, '16UC1')
                 depth = cv2.flip(depth_flipped, -1)  # passing a negative axis index flips both axes
+            elif self.quad_name == 'air':
+                depth = self.bridge.imgmsg_to_cv2(data, '32FC1') * 1000.0
+                far = depth > 4.25 * 1000.0
+                depth = np.zeros_like(depth, dtype=np.float32) * far + (~far) * depth
+                depth = np.uint16(depth)
+                print("============================================================")
+                print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
+                                                                       np.max(depth),
+                                                                       np.any(np.isnan(depth))))
+                # print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
+                #                                                        np.max(depth),
+                #                                                        np.any(np.isnan(depth))))
             else:
                 print("Invalid quad_name!")
                 raise NotImplementedError
             if (np.sum(depth) != 0) and (not np.any(np.isnan(depth))):
                 self.depth = self.preprocess_depth(depth)
                 self.last_depth_received = rospy.Time.now()
-
+            end_time = time.time_ns()
+            time_msg = Float32()
+            time_msg.data = (end_time-start_time) / 1e6
+            self.preproces_time_pub_.publish(time_msg)
         except CvBridgeError as e:
             print(e)
 
@@ -414,7 +436,7 @@ class PlanBase(object):
 
     def evaluate_dagger_condition(self):
         # Real world dagger condition is only based on time
-        if self.reference_progress < 50:
+        if self.reference_progress < 40:
             # At the beginning always use expert (otherwise gives problems)
             print("Expert warm up!")
             return False
@@ -455,6 +477,12 @@ class PlanBase(object):
             self.config.perform_inference = False
             self.callback_land(Empty())
 
+        start_time = time.time_ns()
         self._prepare_net_inputs()
         results = self.learner.inference(self.net_inputs)
         self.trajectory_decision(results)
+        end_time = time.time_ns()
+        time_msg = Float32()
+        time_msg.data = (end_time-start_time) / 1e6
+        self.planning_time_pub_.publish(time_msg)
+

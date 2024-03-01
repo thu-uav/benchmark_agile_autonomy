@@ -22,6 +22,7 @@ test_time:
   max_rollouts: 50
   test_folder: "/tmp/test"
   expert_folder: "../data_generation/data/"
+  scene_path: "scene/forest-low"
   fallback_radius_expert: 0.0 #mt unused at test time
   network_frequency: 15.0 #Hz
   input_update_freq: 15 #Hz

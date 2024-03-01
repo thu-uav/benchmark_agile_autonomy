@@ -2,7 +2,8 @@
 Q_pos_xy:     200   # Cost for horizontal positon error
 Q_pos_z:      500   # Cost for vertical position error
 Q_attitude:   20    # Cost for attitude error
-Q_velocity:   10    # Cost for velocity error
+Q_velocity_xy:   10    # Cost for velocity error
+Q_velocity_z:   10    # Cost for velocity error
 Q_perception: 0     # Cost for reprojection error to camera optical axis (PAMPC)
 
 # Cost on Inputs

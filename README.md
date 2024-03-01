@@ -85,11 +85,13 @@ catkin build
 . ../devel/setup.bash
 
 # Create your learning environment
-roscd planner_learning
-conda create --name tf_24 python=3.7
-conda activate tf_24
-pip install tensorflow-gpu==2.4
-pip install rospkg==1.2.3 pyquaternion open3d opencv-python
+cd benchmark_agile_autonomy
+python3 -m venv agilepy
+source agile_py/bin/activate
+pip install tensorflow-gpu==2.5.0 -i https://pypi.org/simple
+pip install rospkg==1.2.3 pyquaternion open3d==0.10.0 opencv-python==4.9.0.80
+pip install protobuf==3.19.6
+pip install pandas==1.2.1 matplotlib==2.2.5
 ```
 
 Now download the flightmare standalone available at [this link](https://zenodo.org/record/5517791/files/standalone.tar?download=1), extract it and put in the [flightrender](https://github.com/antonilo/flightmare_agile_autonomy/tree/main/flightrender) folder.
