@@ -4,10 +4,11 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Stuff1
         - /Global Stuff1/Grid1
         - /Global Stuff1/Axes1
         - /Images1/GT depth1
+        - /Trajectories1
+        - /Trajectories1/Planned Trajectory1
         - /GlobalPlanner1
       Splitter Ratio: 0.5346534848213196
     Tree Height: 425
@@ -231,7 +232,7 @@ Visualization Manager:
       Displays:
         - Class: rviz/MarkerArray
           Enabled: false
-          Marker Topic: /hummingbird/agile_autonomy/trajectory/raw_nw_prediction
+          Marker Topic: /air/agile_autonomy/trajectory/raw_nw_prediction
           Name: Raw Trajectories
           Namespaces:
             {}
@@ -239,7 +240,7 @@ Visualization Manager:
           Value: false
         - Class: rviz/MarkerArray
           Enabled: true
-          Marker Topic: /hummingbird/agile_autonomy/trajectory/selected_nw_prediction
+          Marker Topic: /air/agile_autonomy/trajectory/selected_nw_prediction
           Name: Selected Trajectory
           Namespaces:
             {}
@@ -247,7 +248,7 @@ Visualization Manager:
           Value: true
         - Class: rviz/MarkerArray
           Enabled: true
-          Marker Topic: /hummingbird/agile_autonomy/trajectory/fitted_nw_prediction
+          Marker Topic: /air/agile_autonomy/trajectory/fitted_nw_prediction
           Name: Fitted Trajectory
           Namespaces:
             {}
@@ -255,7 +256,7 @@ Visualization Manager:
           Value: true
         - Class: rviz/MarkerArray
           Enabled: false
-          Marker Topic: /hummingbird/agile_autonomy/trajectory/arclen_nw_prediction
+          Marker Topic: /air/agile_autonomy/trajectory/arclen_nw_prediction
           Name: Arclen Trajectory
           Namespaces:
             {}
@@ -359,7 +360,7 @@ Visualization Manager:
           Value: false
         - Class: rviz/MarkerArray
           Enabled: true
-          Marker Topic: /hummingbird/agile_autonomy/planned_trajectory
+          Marker Topic: /air/agile_autonomy/planned_trajectory
           Name: Planned Trajectory
           Namespaces:
             {}
@@ -463,7 +464,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 44.22667694091797
+      Distance: 45.260955810546875
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

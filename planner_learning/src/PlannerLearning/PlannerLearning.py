@@ -213,7 +213,7 @@ class PlanLearning(PlanBase):
             self.crashed = False
 
     def evaluate_dagger_condition(self):
-        if self.reference_progress <40:
+        if self.reference_progress < 90:
             # At the beginning always use expert (otherwise gives gazebo problems)
             print("Starting up!")
             return False

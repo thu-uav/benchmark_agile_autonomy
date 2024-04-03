@@ -88,7 +88,7 @@ AgileAutonomy::~AgileAutonomy() { flightmare_bridge_->disconnect(); }
 
 void AgileAutonomy::startExecutionCallback(const std_msgs::BoolConstPtr& msg) {
   ROS_INFO("Received startExecutionCallback message!");
-  computeManeuver(msg->data);
+  computeManeuver(msg->data, traj_id_);
 }
 
 void AgileAutonomy::setupLoggingCallback(const std_msgs::BoolConstPtr& msg) {
@@ -96,7 +96,7 @@ void AgileAutonomy::setupLoggingCallback(const std_msgs::BoolConstPtr& msg) {
     ROS_INFO(
         "Initiated Logging, computing reference trajectory and generating "
         "point cloud!");
-    computeManeuver(false);
+    computeManeuver(false, traj_id_);
   }
 }
 
@@ -140,7 +140,7 @@ void AgileAutonomy::forceHoverCallback(const std_msgs::EmptyConstPtr& msg) {
   state_machine_ = StateMachine::kOff;
 }
 
-void AgileAutonomy::computeManeuver(const bool only_expert) {
+void AgileAutonomy::computeManeuver(const bool only_expert, const int traj_id) {
   ros::Time time_start_computation = ros::Time::now();
   ROS_INFO("Starting maneuver computation");
   reference_progress_abs_ = 0;
@@ -176,15 +176,39 @@ void AgileAutonomy::computeManeuver(const bool only_expert) {
   Eigen::Vector3d end_position_3 =
       start_state.position +
       q_body_world * Eigen::Vector3d(length_straight_, 0.0, 0.0);
-  acrobatic_sequence.appendStraight(end_position_1, end_velocity_1, end_yaw,
-                                    1.1 * maneuver_velocity_,
-                                    traj_sampling_freq_);
-  acrobatic_sequence.appendStraight(end_position_2, end_velocity_2, end_yaw,
-                                    1.1 * maneuver_velocity_,
-                                    traj_sampling_freq_, false);
-  acrobatic_sequence.appendStraight(end_position_3, Eigen::Vector3d::Zero(),
-                                    end_yaw, 1.1 * maneuver_velocity_,
-                                    traj_sampling_freq_);
+  if (traj_id == 0) {
+    acrobatic_sequence.appendStraight(end_position_1, end_velocity_1, end_yaw,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+    acrobatic_sequence.appendStraight(end_position_2, end_velocity_2, end_yaw,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
+    acrobatic_sequence.appendStraight(end_position_3, Eigen::Vector3d::Zero(),
+                                      end_yaw, 1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+  }
+  else if (traj_id == 4) {
+    Eigen::Vector3d wp0 = Eigen::Vector3d(-0.6, 12, start_state.position(2));
+    Eigen::Vector3d wp1 = Eigen::Vector3d(-0.8, 1.5, start_state.position(2));
+    Eigen::Vector3d wp2 = Eigen::Vector3d(7, -12.0, start_state.position(2));
+    double yaw0 = -1.571;
+    Eigen::Vector3d velo0 = Eigen::Vector3d(0.0, -maneuver_velocity_, 0.0);
+    double yaw1 = -1.309;
+    Eigen::Vector3d velo1 = Eigen::Vector3d(0.258 * maneuver_velocity_, -0.966 * maneuver_velocity_, 0.0);
+    double yaw2 = -1.047;
+    Eigen::Vector3d velo2 = Eigen::Vector3d(0.5 * maneuver_velocity_, -0.866 * maneuver_velocity_, 0.0);
+    acrobatic_sequence.appendStraight(wp0, velo0, yaw0,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+    acrobatic_sequence.appendStraight(wp1, velo1, yaw1,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
+    acrobatic_sequence.appendStraight(wp2, Eigen::Vector3d::Zero(),
+                                      yaw2, 1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+  } else {
+    printf("invalid");
+  }
 
   visualizer_->visualizeTrajectories(acrobatic_sequence.getManeuverList());
 
@@ -777,6 +801,9 @@ bool AgileAutonomy::loadParameters() {
 
   if (!quadrotor_common::getParam("maneuver/maneuver_velocity",
                                   maneuver_velocity_, 1.0))
+    return false;
+  if (!quadrotor_common::getParam("maneuver/maneuver_id",
+                                  traj_id_, 0))
     return false;
   int traj_len;
   if (!quadrotor_common::getParam("trajectory/traj_len", traj_len, 10))

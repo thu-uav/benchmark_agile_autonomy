@@ -75,7 +75,7 @@ class AgileAutonomy {
 
   ros::Timer save_timer_;
 
-  void computeManeuver(const bool only_expert);
+  void computeManeuver(const bool only_expert, const int traj_id);
 
   void startExecutionCallback(const std_msgs::BoolConstPtr& msg);
 
@@ -178,6 +178,7 @@ class AgileAutonomy {
   double save_freq_;
 
   bool perform_global_planning_;
+  int traj_id_ = 0;
 
   // Polynomial trajectory representation
   unsigned int traj_len_;

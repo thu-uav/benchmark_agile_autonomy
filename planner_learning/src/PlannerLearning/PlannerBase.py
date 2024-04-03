@@ -209,6 +209,7 @@ class PlanBase(object):
         '''
         try:
             start_time = time.time_ns()
+            # print(self.quad_name)
             if self.quad_name == 'hummingbird':
                 depth = self.bridge.imgmsg_to_cv2(data, '16UC1')
                 # print("============================================================")
@@ -228,10 +229,10 @@ class PlanBase(object):
                 far = depth > 4.25 * 1000.0
                 depth = np.zeros_like(depth, dtype=np.float32) * far + (~far) * depth
                 depth = np.uint16(depth)
-                print("============================================================")
-                print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
-                                                                       np.max(depth),
-                                                                       np.any(np.isnan(depth))))
+                # print("============================================================")
+                # print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
+                #                                                        np.max(depth),
+                #                                                        np.any(np.isnan(depth))))
                 # print("Min Depth {}. Max Depth {}. with Nans {}".format(np.min(depth),
                 #                                                        np.max(depth),
                 #                                                        np.any(np.isnan(depth))))
