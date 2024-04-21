@@ -17,12 +17,12 @@ img_width: 224
 img_height: 224
 checkpoint:
   resume_training: True
-  resume_file: "/tmp/train_5m_tree_straight/20240410-202607/train/ckpt-53"
+  resume_file: "/home/ysa/workspace/flightmare_ws/src/benchmark_agile_autonomy/planner_learning/ckpt/maze3m"
 test_time:
   max_rollouts: 50
   test_folder: "/tmp/test"
   expert_folder: "../data_generation/data/"
-  scene_path: "scene/forest-low"
+  scene_path: "scene/racing-low"
   fallback_radius_expert: 0.0 #mt unused at test time
   network_frequency: 15.0 #Hz
   input_update_freq: 15 #Hz

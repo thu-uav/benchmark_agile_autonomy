@@ -171,9 +171,9 @@ class PlanLearning(PlanBase):
                          self.odometry.pose.pose.position.z]
 
         # Check if crashed into ground or outside a box (check in z, x, y)
-        if (quad_position[0] < self.pc_min[0]) or (quad_position[0] > self.pc_max[0]) or \
-           (quad_position[1] < self.pc_min[1]) or (quad_position[1] > self.pc_max[1]) or \
-           (quad_position[2] < self.pc_min[2]) or (quad_position[2] > self.pc_max[2]):
+        if (quad_position[0] < self.pc_min[0]-3) or (quad_position[0] > self.pc_max[0]+3) or \
+           (quad_position[1] < self.pc_min[1]-3) or (quad_position[1] > self.pc_max[1]+3) or \
+           (quad_position[2] < self.pc_min[2]-3) or (quad_position[2] > self.pc_max[2]+3):
             print("Stopping experiment because quadrotor outside allowed range!")
             print(quad_position)
             self.publish_stop_recording_msg()
@@ -213,7 +213,7 @@ class PlanLearning(PlanBase):
             self.crashed = False
 
     def evaluate_dagger_condition(self):
-        if self.reference_progress < 90:
+        if self.reference_progress < 40:
             # At the beginning always use expert (otherwise gives gazebo problems)
             print("Starting up!")
             return False

@@ -206,6 +206,63 @@ void AgileAutonomy::computeManeuver(const bool only_expert, const int traj_id) {
     acrobatic_sequence.appendStraight(wp2, Eigen::Vector3d::Zero(),
                                       yaw2, 1.1 * maneuver_velocity_,
                                       traj_sampling_freq_);
+  } else if (traj_id == 5) {
+    Eigen::Vector3d wp0 = Eigen::Vector3d(-0.7, 2.5, start_state.position(2));
+    Eigen::Vector3d wp1 = Eigen::Vector3d(0.5, 4.0, start_state.position(2));
+    Eigen::Vector3d wp2 = Eigen::Vector3d(10.5, 5.4, start_state.position(2));
+    double yaw0 = 1.74;
+    Eigen::Vector3d velo0 = Eigen::Vector3d(-0.174 * maneuver_velocity_, 0.985 * maneuver_velocity_, 0.0);
+    double yaw1 = 1.571;
+    Eigen::Vector3d velo1 = Eigen::Vector3d(0.0, maneuver_velocity_, 0.0);
+    double yaw2 = 0;
+    Eigen::Vector3d velo2 = Eigen::Vector3d(maneuver_velocity_, 0, 0.0);
+    acrobatic_sequence.appendStraight(wp0, velo0, yaw0,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+    acrobatic_sequence.appendStraight(wp1, velo1, yaw1,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
+    acrobatic_sequence.appendStraight(wp2, Eigen::Vector3d::Zero(),
+                                      yaw2, 1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+  } else if (traj_id == 6) {
+    Eigen::Vector3d wp0 = Eigen::Vector3d(-1.0, 4.7, start_state.position(2));
+    Eigen::Vector3d wp1 = Eigen::Vector3d(-6.0, -6.0, 4.0);
+    Eigen::Vector3d velo0 = Eigen::Vector3d(-0.5 * maneuver_velocity_, -0.866 * maneuver_velocity_, 0.0);
+    double yaw0 = -2.094;
+    Eigen::Vector3d velo1 = Eigen::Vector3d(0.0, -maneuver_velocity_, 0.0);
+    double yaw1 = -1.571;
+    acrobatic_sequence.appendStraight(wp0, velo0, yaw0,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+    acrobatic_sequence.appendStraight(wp1, velo1, yaw1,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
+  } else if (traj_id == 7) {
+    Eigen::Vector3d wp0 = Eigen::Vector3d(7.0, -6.0, 2.0);
+    Eigen::Vector3d wp1 = Eigen::Vector3d(7.0, 3.71, 2.0);
+    Eigen::Vector3d wp2 = Eigen::Vector3d(-1.0, 4.7, 2.0);
+    Eigen::Vector3d wp3 = Eigen::Vector3d(-6.0, -6.0, 1.5);
+    Eigen::Vector3d velo0 = Eigen::Vector3d(0.0, maneuver_velocity_, 0.0);
+    double yaw0 = 1.571;
+    Eigen::Vector3d velo1 = Eigen::Vector3d(-0.717 * maneuver_velocity_, 0.717 * maneuver_velocity_, 0.0);
+    double yaw1 = 2.356;
+    Eigen::Vector3d velo2 = Eigen::Vector3d(-0.9 * maneuver_velocity_, -0.4 * maneuver_velocity_, 0.0);
+    double yaw2 = -3.00;
+    Eigen::Vector3d velo3 = Eigen::Vector3d(0.0, -maneuver_velocity_, 0.0);
+    double yaw3 = -1.571;
+    acrobatic_sequence.appendStraight(wp0, velo0, yaw0,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_);
+    acrobatic_sequence.appendStraight(wp1, velo1, yaw1,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
+    acrobatic_sequence.appendStraight(wp2, velo2, yaw2,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
+    acrobatic_sequence.appendStraight(wp3, velo3, yaw3,
+                                      1.1 * maneuver_velocity_,
+                                      traj_sampling_freq_, false);
   } else {
     printf("invalid");
   }

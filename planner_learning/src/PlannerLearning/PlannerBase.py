@@ -208,7 +208,7 @@ class PlanBase(object):
         Reads a depth image and saves it.
         '''
         try:
-            start_time = time.time_ns()
+            
             # print(self.quad_name)
             if self.quad_name == 'hummingbird':
                 depth = self.bridge.imgmsg_to_cv2(data, '16UC1')
@@ -242,10 +242,6 @@ class PlanBase(object):
             if (np.sum(depth) != 0) and (not np.any(np.isnan(depth))):
                 self.depth = self.preprocess_depth(depth)
                 self.last_depth_received = rospy.Time.now()
-            end_time = time.time_ns()
-            time_msg = Float32()
-            time_msg.data = (end_time-start_time) / 1e6
-            self.preproces_time_pub_.publish(time_msg)
         except CvBridgeError as e:
             print(e)
 
@@ -478,11 +474,16 @@ class PlanBase(object):
             self.config.perform_inference = False
             self.callback_land(Empty())
 
-        start_time = time.time_ns()
+        start_pre = time.time_ns()
         self._prepare_net_inputs()
+        end_pre = time.time_ns()
+        time_msg = Float32()
+        time_msg.data = (end_pre-start_pre) / 1e6
+        self.preproces_time_pub_.publish(time_msg)
+        start_time = time.time_ns()
         results = self.learner.inference(self.net_inputs)
-        self.trajectory_decision(results)
         end_time = time.time_ns()
+        self.trajectory_decision(results)
         time_msg = Float32()
         time_msg.data = (end_time-start_time) / 1e6
         self.planning_time_pub_.publish(time_msg)
