@@ -17,7 +17,7 @@ img_width: 224
 img_height: 224
 checkpoint:
   resume_training: True
-  resume_file: "/tmp/train_5m_tree_straight/20240410-202607/train/ckpt-56"
+  resume_file: "/home/ysa/workspace/flightmare_ws/src/benchmark_agile_autonomy/planner_learning/ckpt/forest5m"
 test_time:
   max_rollouts: 50
   test_folder: "/tmp/test"
