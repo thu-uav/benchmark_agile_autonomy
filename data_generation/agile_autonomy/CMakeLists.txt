@@ -51,10 +51,10 @@ target_link_libraries(flightmare_bridge stdc++fs
 
 cs_add_executable(agile_autonomy src/agile_autonomy.cpp)
 target_include_directories(agile_autonomy PUBLIC
-        ../../../rpg_mpc/model/quadrotor_mpc_codegen/
-        ../../../rpg_mpc/externals/qpoases
-        ../../../rpg_mpc/externals/qpoases/INCLUDE
-        ../../../rpg_mpc/externals/qpoases/SRC)
+        ../../../FlightBench/dep/rpg_mpc/model/quadrotor_mpc_codegen/
+        ../../../FlightBench/dep/rpg_mpc/externals/qpoases
+        ../../../FlightBench/dep/rpg_mpc/externals/qpoases/INCLUDE
+        ../../../FlightBench/dep/rpg_mpc/externals/qpoases/SRC)
 target_link_libraries(
         agile_autonomy stdc++fs
         flightmare_bridge
